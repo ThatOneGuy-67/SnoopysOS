@@ -1,102 +1,116 @@
-* {
+/* ===== GLOBAL BACKGROUND + CURSOR ===== */
+body {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-  user-select: none;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* ===== DESKTOP ===== */
-body {
-  height: 100vh;
-  overflow: hidden;
-  color: #ffffff;
-
-  background:
-    linear-gradient(rgba(35,35,35,0.85), rgba(35,35,35,0.85)),
-    url("https://i.pinimg.com/originals/11/cf/ee/11cfeef9eaa56c71a6eeb9933f933492.gif");
-
+  font-family: monospace;
+  background: 
+  linear-gradient(rgba(30, 30, 30, 0.7), rgba(30, 30, 30, 0.7)),
+  url("https://i.pinimg.com/originals/11/cf/ee/11cfeef9eaa56c71a6eeb9933f933492.gif") no-repeat center center fixed;
+  background-color: #181818c0;
   background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  cursor: none; /* hide default cursor */
 }
 
-#desktop {
-  height: calc(100vh - 48px);
-  padding: 16px;
-}
-
-/* ===== ICONS ===== */
-.icon {
-  width: 80px;
-  text-align: center;
-  cursor: pointer;
-}
-
-.icon-img {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto;
-  border-radius: 10px;
-
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,0.25);
-}
-
-.icon span {
-  display: block;
-  font-size: 12px;
-  margin-top: 6px;
-  opacity: 0.9;
-}
-
-/* ===== TASKBAR ===== */
-#taskbar {
+/* Custom gray circle cursor */
+.custom-cursor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: gray;
   position: fixed;
-  bottom: 0;
-  width: 100%;
-  height: 48px;
+  pointer-events: none;
+  z-index: 10000;
+}
 
+/* ===== BOOT SCREEN ===== */
+#boot {
+  position: fixed;
+  inset: 0;
+  background: black;
+  color: white;
+  font-family: monospace;
+  font-size: 10px;
+  padding: 10px;
+  overflow-y: auto;   /* MUST be scrollable */
+  z-index: 9999;
+}
+
+#boot::-webkit-scrollbar {
+  display: none;
+}
+
+#boot .cursor {
+  display: inline-block;
+  width: 10px;
+  animation: blink 1s step-start infinite;
+}
+
+/* ===== LOGIN SCREEN ===== */
+#loginScreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(20,20,20,0.9);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
-
-  background: rgba(20,20,20,0.88);
-  backdrop-filter: blur(14px);
-  border-top: 1px solid rgba(255,255,255,0.2);
+  justify-content: center;
+  z-index: 1000;
+  color: white;
 }
 
-#start {
-  width: 70px;
+.hidden { display: none; }
+
+.login-box {
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  background: rgba(30,30,30,0.85);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 12px;
   text-align: center;
+  color: white;
+  width: 250px;
+}
+
+.login-box input {
+  width: 90%;
+  padding: 5px;
+  margin-top: 10px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  color: white;
+  border-radius: 5px;
+}
+.login-box button {
+  margin-top: 15px;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 5px;
+  background: #4caf50;
+  color: white;
   cursor: pointer;
-  font-size: 14px;
 }
-
-#tasks {
-  flex: 1;
-}
-
-#clock {
-  width: 90px;
-  text-align: center;
-  font-size: 13px;
-  opacity: 0.8;
-}
-
-/* ===== WINDOWS ===== */
+/* ===== DESKTOP WINDOWS ===== */
 .window {
   position: absolute;
   width: 360px;
   height: 240px;
-
-  background: rgba(25,25,25,0.92);
+  background: rgba(25,25,25,0.85);
   backdrop-filter: blur(16px);
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,0.25);
-
-  box-shadow: 0 0 30px rgba(0,0,0,0.65);
+  box-shadow: 0 0 30px rgba(0,0,0,0.6);
   overflow: hidden;
+}
+
+.window.max {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: calc(100vh - 48px) !important;
+  border-radius: 0;
 }
 
 .titlebar {
@@ -105,73 +119,12 @@ body {
   align-items: center;
   padding: 0 10px;
   cursor: move;
-
   background: rgba(255,255,255,0.08);
 }
 
 .titlebar span {
   flex: 1;
   font-size: 13px;
-}
-
-.close {
-  cursor: pointer;
-  opacity: 0.6;
-}
-
-.close:hover {
-  opacity: 1;
-}
-
-.content {
-  padding: 12px;
-  font-size: 14px;
-  opacity: 0.95;
-}
-
-.icon-img {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 24px;
-  border-radius: 10px;
-
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,0.25);
-}
-
-#startMenu {
-  position: fixed;
-  bottom: 48px;
-  left: 8px;
-  width: 220px;
-
-  background: rgba(30,30,30,0.95);
-  backdrop-filter: blur(16px);
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.25);
-
-  padding: 8px;
-}
-
-.menu-item {
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 8px;
-}
-
-.menu-item:hover {
-  background: rgba(255,255,255,0.12);
-}
-
-.hidden {
-  display: none;
 }
 
 .controls button {
@@ -182,10 +135,52 @@ body {
   margin-left: 6px;
 }
 
-.window.max {
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: calc(100vh - 48px) !important;
-  border-radius: 0;
+/* ===== DESKTOP ICONS ===== */
+#desktop {
+  height: calc(100vh - 48px);
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.icon-img {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+/* ===== TASKBAR ===== */
+#taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 48px;
+  background: rgba(30,30,30,0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.6);
+  color: white;
+  font-family: sans-serif;
+}
+
+#tasks button {
+  margin-right: 4px;
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
 }
