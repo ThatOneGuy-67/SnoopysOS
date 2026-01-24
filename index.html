@@ -2,39 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Snoopy’s OS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snoopy's OS</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Desktop -->
-  <div id="desktop">
-    <div class="icon" onclick="launchApp('About')">
-      <div class="icon-img">💻</div>
-      <span>About</span>
-    </div>
-    <div class="icon" onclick="launchApp('Files')">
-        <div class="icon-img">📁</div>
-        <span>Files</span>
-    </div>
-
-    <div class="icon" onclick="launchApp('Settings')">
-        <div class="icon-img">⚙️</div>
-        <span>Settings</span>
-    </div>
-
+  <!-- BOOT SCREEN -->
+  <div id="boot">
+    <pre id="bootText"></pre>
+    <span class="cursor"> </span>
   </div>
 
-  <!-- Taskbar -->
-  <div id="taskbar">
-    <div id="start">☰</div>
-    <div id="tasks"></div>
-    <div id="clock"></div>
-    <div id="startMenu" class="hidden">
-    <div class="menu-item" onclick="launchApp('About')">About</div>
-    <div class="menu-item" onclick="launchApp('Files')">Files</div>
-    <div class="menu-item" onclick="launchApp('Settings')">Settings</div>
+        <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="hidden">
+        <div class="login-box glass">
+            <h2>Welcome to SnoopyOS<br>Please log in</h2>
+            <input id="user" placeholder="Username">
+            <button onclick="login()">Enter</button>
+        </div>
+    </div>
+
+
+  <!-- DESKTOP -->
+  <div id="osRoot" class="hidden">
+    <div id="desktop">
+      <div class="icon" onclick="launchApp('About')">
+        <div class="icon-img">💻</div>
+        <span>About</span>
+      </div>
+      <div class="icon" onclick="launchApp('Files')">
+        <div class="icon-img">📁</div>
+        <span>Files</span>
+      </div>
+      <div class="icon" onclick="launchApp('Settings')">
+        <div class="icon-img">⚙️</div>
+        <span>Settings</span>
+      </div>
+    </div>
+
+    <!-- TASKBAR -->
+    <div id="taskbar">
+      <div id="start">☰</div>
+      <div id="tasks"></div>
+      <div id="clock"></div>
+    </div>
   </div>
 
   <script src="os.js"></script>
