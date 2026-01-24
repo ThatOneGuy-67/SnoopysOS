@@ -1,0 +1,147 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ===== DESKTOP ===== */
+body {
+  height: 100vh;
+  overflow: hidden;
+  color: #ffffff;
+
+  background:
+    linear-gradient(rgba(35,35,35,0.85), rgba(35,35,35,0.85)),
+    url("https://i.pinimg.com/originals/11/cf/ee/11cfeef9eaa56c71a6eeb9933f933492.gif");
+
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+#desktop {
+  height: calc(100vh - 48px);
+  padding: 16px;
+}
+
+/* ===== ICONS ===== */
+.icon {
+  width: 80px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.icon-img {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+  border-radius: 10px;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.25);
+}
+
+.icon span {
+  display: block;
+  font-size: 12px;
+  margin-top: 6px;
+  opacity: 0.9;
+}
+
+/* ===== TASKBAR ===== */
+#taskbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+
+  background: rgba(20,20,20,0.88);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+#start {
+  width: 70px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#tasks {
+  flex: 1;
+}
+
+#clock {
+  width: 90px;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* ===== WINDOWS ===== */
+.window {
+  position: absolute;
+  width: 360px;
+  height: 240px;
+
+  background: rgba(25,25,25,0.92);
+  backdrop-filter: blur(16px);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.25);
+
+  box-shadow: 0 0 30px rgba(0,0,0,0.65);
+  overflow: hidden;
+}
+
+.titlebar {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  cursor: move;
+
+  background: rgba(255,255,255,0.08);
+}
+
+.titlebar span {
+  flex: 1;
+  font-size: 13px;
+}
+
+.close {
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.close:hover {
+  opacity: 1;
+}
+
+.content {
+  padding: 12px;
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.icon-img {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 24px;
+  border-radius: 10px;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.25);
+}
