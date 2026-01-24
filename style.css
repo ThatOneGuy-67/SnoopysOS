@@ -145,3 +145,47 @@ body {
   backdrop-filter: blur(6px);
   border: 1px solid rgba(255,255,255,0.25);
 }
+
+#startMenu {
+  position: fixed;
+  bottom: 48px;
+  left: 8px;
+  width: 220px;
+
+  background: rgba(30,30,30,0.95);
+  backdrop-filter: blur(16px);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.25);
+
+  padding: 8px;
+}
+
+.menu-item {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.menu-item:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+.hidden {
+  display: none;
+}
+
+.controls button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+.window.max {
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: calc(100vh - 48px) !important;
+  border-radius: 0;
+}
