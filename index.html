@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Snoopy’s OS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Desktop -->
+  <div id="desktop">
+    <div class="icon" onclick="openWindow('About Snoopy’s OS', aboutText)">
+      <div class="icon-img">💻</div>
+      <span>About</span>
+    </div>
+  </div>
+
+  <!-- Taskbar -->
+  <div id="taskbar">
+    <div id="start">☰</div>
+    <div id="tasks"></div>
+    <div id="clock"></div>
+  </div>
+
+  <script src="os.js"></script>
+</body>
+</html>
