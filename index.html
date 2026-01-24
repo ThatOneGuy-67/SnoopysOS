@@ -10,10 +10,20 @@
 
   <!-- Desktop -->
   <div id="desktop">
-    <div class="icon" onclick="openWindow('About Snoopy’s OS', aboutText)">
+    <div class="icon" onclick="launchApp('About')">
       <div class="icon-img">💻</div>
       <span>About</span>
     </div>
+    <div class="icon" onclick="launchApp('Files')">
+        <div class="icon-img">📁</div>
+        <span>Files</span>
+    </div>
+
+    <div class="icon" onclick="launchApp('Settings')">
+        <div class="icon-img">⚙️</div>
+        <span>Settings</span>
+    </div>
+
   </div>
 
   <!-- Taskbar -->
@@ -21,6 +31,10 @@
     <div id="start">☰</div>
     <div id="tasks"></div>
     <div id="clock"></div>
+    <div id="startMenu" class="hidden">
+    <div class="menu-item" onclick="launchApp('About')">About</div>
+    <div class="menu-item" onclick="launchApp('Files')">Files</div>
+    <div class="menu-item" onclick="launchApp('Settings')">Settings</div>
   </div>
 
   <script src="os.js"></script>
