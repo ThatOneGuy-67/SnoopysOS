@@ -14,21 +14,16 @@ const bootText = document.getElementById("bootText");
 
 function randomLine() {
   const hex = () => Math.floor(Math.random() * 0xffffffff).toString(16);
-
-  // Random error or normal line
-  let isError = Math.random() < 0.1; // 10% chance
+  let isError = Math.random() < 0.1;
   let prefix = isError ? "[ERROR] " : (Math.random() > 0.2 ? "[ OK ] " : "[WARN] ");
-
-  // Random line length
   let length = 40 + Math.floor(Math.random() * 40);
   let line = prefix;
   while (line.length < length) line += `sys_${hex()} `;
-
   return { line, isError };
 }
 
 let bootLinesPrinted = 0;
-const maxBootLines = 200; // total lines before finishing boot
+const maxBootLines = 700;
 
 function printBootLine() {
   if (bootLinesPrinted < maxBootLines) {
@@ -36,26 +31,20 @@ function printBootLine() {
     const span = document.createElement("span");
     span.textContent = line + "\n";
     if (isError) span.style.color = "red";
-
     bootText.appendChild(span);
     bootText.parentElement.scrollTop = bootText.parentElement.scrollHeight;
-
     bootLinesPrinted++;
-    setTimeout(printBootLine, 8); // faster typing
+    setTimeout(printBootLine, 6.7);   // adjust speed here
   } else {
-    // Boot complete, show SUCCESS in green
     const success = document.createElement("span");
     success.textContent = "[SUCCESS] Boot completed\n";
     success.style.color = "green";
     bootText.appendChild(success);
     bootText.parentElement.scrollTop = bootText.parentElement.scrollHeight;
-
-    // Start countdown
-    startCountdown(5);
+    startCountdown(3);
   }
 }
 
-// Countdown before launching OS
 function startCountdown(seconds) {
   if (seconds > 0) {
     const span = document.createElement("span");
@@ -65,45 +54,33 @@ function startCountdown(seconds) {
     bootText.parentElement.scrollTop = bootText.parentElement.scrollHeight;
     setTimeout(() => startCountdown(seconds - 1), 1000);
   } else {
-    const span = document.createElement("span");
-    span.textContent = "Launching Snoopy's OS now!\n";
-    span.style.color = "lightgreen";
-    bootText.appendChild(span);
-    bootText.parentElement.scrollTop = bootText.parentElement.scrollHeight;
-
-    // Here you can trigger your desktop / main OS screen
-    launchSnoopysOS();
+    document.getElementById("boot").classList.add("hidden");
+    document.getElementById("loginScreen").classList.remove("hidden");
+    document.getElementById("user").focus();
   }
-}
-
-// Placeholder function for launching your OS
-function launchSnoopysOS() {
-  console.log("Snoopy's OS would now appear!");
 }
 
 printBootLine();
 
-
 // ===== LOGIN =====
-function login(){
+function login() {
   const username = document.getElementById("user").value.trim();
-  if(!username) return alert("Enter username!");
+  if (!username) return alert("Enter username!");
   document.getElementById("loginScreen").remove();
   document.getElementById("osRoot").classList.remove("hidden");
 }
 
 // ===== WINDOWS / TASKBAR =====
 const tasks = document.getElementById("tasks");
-function launchApp(app){
-  openWindow(app, getAppContent(app));
+
+function launchApp(app) {
+  openWindow(app, appHTML[app] || getAppContent(app));
 }
 
 function openWindow(title, content){
   const win = document.createElement("div");
   win.className = "window";
   win.style.zIndex = ++zIndex;
-  win.style.left = "120px";
-  win.style.top = "120px";
 
   const taskBtn = document.createElement("button");
   const taskId = "task_" + Date.now();
@@ -116,6 +93,11 @@ function openWindow(title, content){
   };
   tasks.appendChild(taskBtn);
 
+  // AUTO-DETECT URL → IFRAME
+  const windowContent = typeof content === "string" && content.startsWith("http")
+    ? `<iframe src="${content}" style="width:100%;height:100%;display:block;border:none;" sandbox="allow-scripts allow-same-origin"></iframe>`
+    : content;
+
   win.innerHTML = `
     <div class="titlebar">
       <span>${title}</span>
@@ -125,48 +107,77 @@ function openWindow(title, content){
         <button onclick="closeWin(this,event)">✕</button>
       </div>
     </div>
-    <div class="content">${content}</div>
+    <div class="content">${windowContent}</div>
   `;
+
   document.body.appendChild(win);
   makeDraggable(win);
+
+  // CENTER AFTER WINDOW RENDERS
+  requestAnimationFrame(() => {
+    // use a second frame in case iframe content affects size
+    requestAnimationFrame(() => {
+      const rect = win.getBoundingClientRect();
+      win.style.left = Math.max(0, (window.innerWidth - rect.width)/2) + "px";
+      win.style.top  = Math.max(0, (window.innerHeight - rect.height)/2) + "px";
+    });
+  });
 }
 
+
 // ===== DRAG + SNAP =====
-function makeDraggable(win){
+function makeDraggable(win) {
   const bar = win.querySelector(".titlebar");
-  let offsetX=0, offsetY=0;
-  bar.onmousedown = e=>{
-    offsetX=e.clientX-win.offsetLeft;
-    offsetY=e.clientY-win.offsetTop;
-    document.onmousemove = e=>{
-      let x = e.clientX-offsetX;
-      let y = e.clientY-offsetY;
-      if(e.clientX<20) win.classList.add("snap-left");
-      else if(e.clientX>window.innerWidth-20) win.classList.add("snap-right");
-      else win.classList.remove("snap-left","snap-right");
-      win.style.left = x+"px";
-      win.style.top = y+"px";
+  let offsetX = 0, offsetY = 0;
+
+  bar.onmousedown = e => {
+    offsetX = e.clientX - win.offsetLeft;
+    offsetY = e.clientY - win.offsetTop;
+
+    document.onmousemove = e => {
+      win.style.left = e.clientX - offsetX + "px";
+      win.style.top = e.clientY - offsetY + "px";
       win.style.zIndex = ++zIndex;
-    }
-    document.onmouseup=()=>{document.onmousemove=null;}
-  }
+    };
+
+    document.onmouseup = () => {
+      document.onmousemove = null;
+    };
+  };
 }
 
 // ===== MINIMIZE/MAXIMIZE/CLOSE =====
-function minimize(btn){ btn.closest(".window").classList.add("hidden"); }
-function maximize(btn){ btn.closest(".window").classList.toggle("max"); }
-function closeWin(btn,e){
+function minimize(btn) {
+  btn.closest(".window").classList.add("hidden");
+}
+function maximize(btn) {
+  btn.closest(".window").classList.toggle("max");
+}
+function closeWin(btn, e) {
   e.stopPropagation();
   const win = btn.closest(".window");
-  const taskId = win.dataset.task;
-  document.getElementById(taskId)?.remove();
+  document.getElementById(win.dataset.task)?.remove();
   win.remove();
 }
 
-// ===== EXAMPLE APP CONTENT =====
-function getAppContent(app){
-  if(app==="About") return "SnoopyOS v0.3<br>Glass + Snap + Terminal Boot!";
-  if(app==="Files") return "<ul><li>Documents</li><li>Downloads</li><li>System</li></ul>";
-  if(app==="Settings") return "Settings panel: theme, permissions, etc.";
+// ===== APPS (PASTE LINKS HERE) =====
+const appHTML = {
+  "Chat": "https://thatoneguy-67.github.io/Snoopy-s-Chat/",
+  "Soundboard": "https://thatoneguy-67.github.io/ThatOneGuys-Soundboard/"
+  "Games": "https://thatoneguy-67.github.io/SnoopyOS-Games/"
+};
+
+function getAppContent(app) {
+  if (app === "About") return "SnoopyOS v0.3<br>Glass + Snap + Boot Screen";
+  if (app === "Files") return "<ul><li>Documents</li><li>Downloads</li><li>System</li></ul>";
+  if (app === "Settings") return "Settings panel coming soon";
   return "Unknown app";
 }
+// ===== CLOCK =====
+function updateClock() {
+  const clock = document.getElementById("clock");
+  const now = new Date();
+  clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit'});
+}
+setInterval(updateClock, 1000);
+updateClock();
