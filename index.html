@@ -4,311 +4,511 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Snoopy's OS</title>
-
 </head>
 <body>
 
-    <style>
+
+  <style>
         /* ===== GLOBAL BACKGROUND + CURSOR ===== */
-        body {
-        margin: 0;
-        padding: 0;
-        font-family: monospace;
-        background: 
-        linear-gradient(rgba(30, 30, 30, 0.7), rgba(30, 30, 30, 0.7)),
-        url("https://i.pinimg.com/originals/11/cf/ee/11cfeef9eaa56c71a6eeb9933f933492.gif") no-repeat center center fixed;
-        background-color: #181818c0;
-        background-size: cover;
-        cursor: none; /* hide default cursor */
-        }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: monospace;
+      background: 
+      linear-gradient(rgba(30, 30, 30, 0.7), rgba(30, 30, 30, 0.7)),
+      url("https://i.pinimg.com/originals/11/cf/ee/11cfeef9eaa56c71a6eeb9933f933492.gif") no-repeat center center fixed;
+      background-color: #181818c0;
+      background-size: cover;
+      cursor: none; /* hide default cursor */
+    }
 
-        /* Custom gray circle cursor */
-        .custom-cursor {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: gray;
-        position: fixed;
-        pointer-events: none;
-        z-index: 10000;
-        }
+    #logoScreen {
+      position: fixed;
+      inset: 0;
+      background: #0b0b0b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 50;
+    }
 
-        /* ===== BOOT SCREEN ===== */
-        #boot {
-        position: fixed;
-        inset: 0;
-        background: black;
-        color: white;
-        font-family: monospace;
-        font-size: 10px;
-        padding: 10px;
-        overflow-y: auto;   /* MUST be scrollable */
-        z-index: 9999;
-        }
+    .chromeHalf {
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      background: url("https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.png") center/contain no-repeat;
+      overflow: hidden;
+      z-index: 2;
+    }
 
-        #boot::-webkit-scrollbar {
-        display: none;
-        }
+    /* Clip each half */
+    #chromeLeft { clip-path: inset(0 50% 0 0); }
+    #chromeRight { clip-path: inset(0 0 0 50%); }
 
-        #boot .cursor {
-        display: inline-block;
-        width: 10px;
-        animation: blink 1s step-start infinite;
-        }
+    /* Slide animations */
+    @keyframes leftSlide { to { transform:translateX(-260px); opacity:0; } }
+    @keyframes rightSlide { to { transform:translateX(260px); opacity:0; } }
 
-        /* ===== LOGIN SCREEN ===== */
-        #loginScreen {
-        position: fixed;
-        inset: 0;
-        background: rgba(20,20,20,0.9);
-        backdrop-filter: blur(12px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-        color: white;
-        transition: opacity 0.5s ease; /* smooth fade if you want to animate in */
-        }
+    /* Logo text */
+    #logo {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transform: scale(0.25);
+      z-index: 3;
+    }
 
-        .hidden { display: none; opacity: 0; }
-        .nonhidden { display: flex; opacity: 1; }
+    #logoS {
+      font-size: 140px;
+      color: #f5f5f5;
+      text-shadow: 0 0 12px rgba(255,255,255,0.6), 0 0 35px rgba(255,255,255,0.35);
+      opacity: 0;
+      transform: scale(0.25);
+    }
 
-        .login-box {
-        position: relative;
-        background: rgba(49, 49, 49, 0.507);
-        backdrop-filter: blur(10px);
-        padding: 30px 20px;
-        border-radius: 14px;
-        text-align: center;
-        color: white;
-        width: 500px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-        transition: transform 0.3s ease, opacity 0.3s ease; /* smooth pop-in */
-        }
-
-        .login-box input {
-        width: 90%;
-        padding: 8px;
-        margin-top: 10px;
-        background: rgba(255,255,255,0.1);
-        border: none;
-        color: white;
-        border-radius: 6px;
-        font-size: 0.95rem;
-        outline: none;
-        transition: background 0.2s ease;
-        cursor: none;
-        }
-
-        .login-box input:focus {
-        background: rgba(255,255,255,0.2);
-        }
-
-        .login-box button {
-        margin-top: 15px;
-        padding: 8px 20px;
-        border: none;
-        border-radius: 6px;
-        background: #3f3f3fa6;
-        color: white;
-        font-size: 1rem;
-        cursor: none;
-        transition: background 0.2s ease, transform 0.2s ease;
-        }
-
-        .login-box button:hover {
-        background: #797a79;
-        transform: scale(1.05);
-        }
-
-        /* ===== DESKTOP ICONS ===== */
-        #desktop {
-        height: calc(100vh - 48px);
-        padding: 16px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;   /* center horizontally */
-        align-content: center;     /* center vertically */
-        gap: 24px;
-        }
-
-        .icon-img {
-        width: 48px;
-        height: 48px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        border-radius: 10px;
-        background: rgba(255,255,255,0.15);
-        backdrop-filter: blur(6px);
-        border: 1px solid rgba(255,255,255,0.25);
-        }
-
-        /* Icon name text */
-        #desktop .icon span {
-        color: #dad8d5e3; /* icon text color */
-        }
-
-        .icon {
-        position: static;          /* IMPORTANT */
-        }
-        .icon:hover {
-        background: rgba(255,255,255,0.25);
-        cursor: none;
-        }
-        .icon span {
-        display: block;
-        margin-top: 6px;
-        font-size: 0.85rem;
-        text-align: center;
-        }
-        /* ===== TASKBAR ===== */
-        #taskbar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 48px;
-        background: rgba(30,30,30,0.85);
-        backdrop-filter: blur(12px);
-        display: flex;
-        align-items: center;
-        padding: 0 10px;
-        box-shadow: 0 -2px 8px rgba(0,0,0,0.6);
-        color: white;
-        font-family: sans-serif;
-        }
-
-        #tasks button {
-        margin-right: 4px;
-        background: rgba(255,255,255,0.08);
-        border: none;
-        color: white;
-        padding: 4px 10px;
-        border-radius: 6px;
-        cursor: none;
-        }
-
-        /* ===== DESKTOP WINDOWS ===== */
-        .window {
-        position: absolute;
-        width: 640px;
-        height: 500px;
-        background: rgba(25,25,25,0.85);
-        backdrop-filter: blur(16px);
-        border-radius: 14px;
-        border: 1px solid rgba(255,255,255,0.25);
-        box-shadow: 0 0 30px rgba(0,0,0,0.6);
-        overflow: hidden;
-        transition: top 0.07s ease, left 0.07s ease;
-        }
-
-        .window.max {
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: calc(100vh - 48px) !important;
-        border-radius: 0;
-        }
-
-        .titlebar {
-        height: 34px;
-        display: flex;
-        align-items: center;
-        padding: 0 10px;
-        cursor: none;
-        background: rgba(255,255,255,0.08);
-        }
-
-        .titlebar span {
-        flex: 1;
-        font-size: 13px;
-        }
-
-        .controls button {
-        background: none;
-        border: none;
-        color: white;
-        cursor: none;
-        margin-left: 6px;
-        }
-
-        /* ===== WINDOW TITLE AND CONTENT COLORS ===== */
-        .window {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        }
-
-        .window .titlebar {
-        background: rgba(255,255,255,0.08); /* window titlebar background */
-        }
-
-        .window .titlebar span {
-        color: #a1a1a1e7; /* app name text color */
-        }
-
-        .window .content {
-        color: #e6e6e6; /* content text color */
-        flex: 1;
-        height: 100%;
-        overflow: hidden;
-        }
-        .window .content a {
-        color: #4fc3f7; /* content link color */
-        }
-
-        .window.max {
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        }
-
-        /* ===== CLOCK STYLES ===== */
-        .clock {
-        margin-left: auto;
-        font-family: monospace;
-            cursor: none;
-        }
-
-        /* ===== BLINKING CURSOR ANIMATION ===== */
-        @keyframes blink {
-        0%, 50% { opacity: 1; }
-        51%, 100% { opacity: 0; }
-        }
-
-        /* Prevent text selection globally */
-        body, body * {
-        user-select: none;       /* Standard */
-        -webkit-user-select: none; /* Chrome/Safari */
-        -moz-user-select: none;    /* Firefox */
-        -ms-user-select: none;     /* IE/Edge */
-        }
-        /* Scrollbar hidden for all scrollable elements */
-        ::-webkit-scrollbar {
-        display: none;
-        }
-    </style>
+    #logoRest {
+      font-size: 84px;
+      margin-left: 6px;
+      color: #eaeaea;
+      opacity: 0;
+      transform: translateX(50px);
+    }
 
 
 
-  <!-- BOOT SCREEN -->
-  <div id="boot">
-    <pre id="bootText"></pre>
-    <span class="cursor"> </span>
-  </div>
+    /* Custom gray circle cursor */
+    .custom-cursor {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: gray;
+      position: fixed;
+      pointer-events: none;
+      z-index: 10000;
+    }
 
-        <!-- LOGIN SCREEN -->
+    /* ===== BOOT SCREEN ===== */
+    #boot {
+      position: fixed;
+      inset: 0;
+      background: black;
+      color: white;
+      font-family: monospace;
+      font-size: 10px;
+      padding: 10px;
+      overflow-y: auto;   /* MUST be scrollable */
+      z-index: 9999;
+    }
+
+    #boot::-webkit-scrollbar {
+      display: none;
+    }
+
+    #boot .cursor {
+      display: inline-block;
+      width: 10px;
+      animation: blink 1s step-start infinite;
+    }
+
+    /* ===== LOGIN SCREEN ===== */
+    #loginScreen {
+      position: fixed;
+      inset: 0;
+      background: rgba(20,20,20,0.9);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      color: white;
+      transition: opacity 0.5s ease; /* smooth fade if you want to animate in */
+    }
+
+    .hidden { display: none; opacity: 0; }
+    .nonhidden { display: flex; opacity: 1; }
+
+    .login-box {
+      position: relative;
+      background: rgba(49, 49, 49, 0.507);
+      backdrop-filter: blur(10px);
+      padding: 30px 20px;
+      border-radius: 14px;
+      text-align: center;
+      color: white;
+      width: 500px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      transition: transform 0.3s ease, opacity 0.3s ease; /* smooth pop-in */
+    }
+
+    .login-box input {
+      width: 90%;
+      padding: 8px;
+      margin-top: 10px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: background 0.2s ease;
+      cursor: none;
+    }
+
+    .login-box input:focus {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .login-box button {
+      margin-top: 15px;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 6px;
+      background: #3f3f3fa6;
+      color: white;
+      font-size: 1rem;
+      cursor: none;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .login-box button:hover {
+      background: #797a79;
+      transform: scale(1.05);
+    }
+
+    /* ===== DESKTOP ICONS ===== */
+    #desktop {
+      height: calc(100vh - 48px);
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;   /* center horizontally */
+      align-content: center;     /* center vertically */
+      gap: 24px;
+    }
+
+    .icon-img {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    /* Icon name text */
+    #desktop .icon span {
+      color: #dad8d5e3; /* icon text color */
+    }
+
+    .icon {
+      position: static;          /* IMPORTANT */
+    }
+    .icon:hover {
+      background: rgba(255,255,255,0.25);
+      cursor: none;
+    }
+    .icon span {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    /* ===== TASKBAR ===== */
+    #taskbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 48px;
+      background: rgba(30,30,30,0.85);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.6);
+      color: white;
+      font-family: sans-serif;
+    }
+
+    #tasks button {
+      margin-right: 4px;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: none;
+    }
+
+    /* ===== DESKTOP WINDOWS ===== */
+    .window {
+      position: absolute;
+      width: 640px;
+      height: 500px;
+      background: rgba(25,25,25,0.85);
+      backdrop-filter: blur(16px);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 0 0 30px rgba(0,0,0,0.6);
+      overflow: hidden;
+      transition: top 0.07s ease, left 0.07s ease;
+    }
+
+    .window.max {
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: calc(100vh - 48px) !important;
+      border-radius: 0;
+    }
+
+    .titlebar {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      cursor: none;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .titlebar span {
+      flex: 1;
+      font-size: 13px;
+    }
+
+    .controls button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: none;
+      margin-left: 6px;
+    }
+
+    /* ===== WINDOW TITLE AND CONTENT COLORS ===== */
+    .window {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .window .titlebar {
+      background: rgba(255,255,255,0.08); /* window titlebar background */
+    }
+
+    .window .titlebar span {
+      color: #a1a1a1e7; /* app name text color */
+    }
+
+    .window .content {
+      color: #e6e6e6; /* content text color */
+      flex: 1;
+      height: 100%;
+      overflow: hidden;
+    }
+    .window .content a {
+      color: #4fc3f7; /* content link color */
+    }
+
+    .window.max {
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+    }
+
+    /* ===== CLOCK STYLES ===== */
+    .clock {
+      margin-left: auto;
+      font-family: monospace;
+      cursor: none;
+      position: fixed;
+      left: 95%;
+    }
+
+    /* ===== BLINKING CURSOR ANIMATION ===== */
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    /* Prevent text selection globally */
+    body, body * {
+      user-select: none;       /* Standard */
+      -webkit-user-select: none; /* Chrome/Safari */
+      -moz-user-select: none;    /* Firefox */
+      -ms-user-select: none;     /* IE/Edge */
+    }
+    /* Scrollbar hidden for all scrollable elements */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollable {
+      overflow-y: auto;
+    }
+    .scrollable::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollable {
+      overflow-y: auto;
+    }
+    .scrollable::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollable {
+      overflow-y: auto;
+    }
+
+    /* ===== GLASS WINDOW ===== */
+    .glass {
+      background: rgba(40, 40, 40, 0.55);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    /* ===== SETTINGS ITEMS ===== */
+    .setting {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(25, 25, 25, 0.55);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    /* ===== SWITCH STYLING ===== */
+    .switch {
+      position: relative;
+      width: 50px;
+      height: 26px;
+    }
+
+    .switch input { display: none; }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(120, 120, 120, 0.4);
+      border-radius: 20px;
+      transition: 0.3s;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      left: 3px;
+      top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+
+    input:checked + .slider { background: var(--accent); }
+    input:checked + .slider::before { transform: translateX(24px); }
+
+    /* ===== ACCENT PICKER ===== */
+    input[type="color"] {
+      width: 60px;
+      height: 36px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* ===== SETTINGS BUTTON ===== */
+    .settingsbutton {
+      padding: 10px;
+      width: 100%;
+      margin-top: 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(60, 60, 60, 0.5);
+      color: white;
+      font-size: 1rem;
+      cursor: none;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .settingsbutton:hover {
+      background: rgba(100, 100, 100, 0.6);
+      transform: scale(1.03);
+    }
+    .settingsbutton:active {
+      transform: scale(0.98);
+    }
+    /* ===== TOAST NOTIFICATION ADJUSTMENT ===== */
+    /* Reduced display time for toasts */
+    .toast {
+      width: 280px;
+      background: rgba(25, 25, 25, 0.65);
+      backdrop-filter: blur(20px);
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      overflow: hidden;
+      cursor: pointer;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast-content {
+      padding: 14px;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .toast-bar {
+      height: 4px;
+      width: 100%;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-120%); }
+      to { transform: translateX(0); }
+    }
+  </style>
+
+
+
+
+    <!-- BOOT SCREEN -->
+    <div id="boot">
+        <pre id="bootText"></pre>
+        <span class="cursor"> </span>
+    </div>
+
+        <!-- LOGO ANIMATION SCREEN -->
+    <div id="logoScreen" class="hidden">
+        <div class="chromeHalf" id="chromeLeft"></div>
+            <div class="chromeHalf" id="chromeRight"></div>
+            <div id="logo">
+            <div id="logoS">S</div>
+            <div id="logoRest">noopyOS</div>
+        </div>
+    </div>
+
+    <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="hidden">
         <div class="login-box glass">
-            <h2>Welcome to SnoopyOS<br>Please log in</h2>
+            <h2 id="loginTitle">Welcome to SnoopyOS<br>Please log in</h2>
             <input id="user" placeholder="Username">
             <button onclick="login()">Enter</button>
         </div>
     </div>
+
+
 
 
   <!-- DESKTOP -->
@@ -324,14 +524,14 @@
             <span>Files</span>
         </div>
 
-        <div class="icon" onclick="launchApp('Settings')">
+        <div class="icon" onclick="launchSettings()">
             <div class="icon-img">⚙️</div>
             <span>Settings</span>
         </div>
 
-        <div class="icon" onclick="launchApp('Calculator')">
-            <div class="icon-img">🧮</div>
-            <span>Calculator</span>
+        <div class="icon" onclick="launchApp('Chat')">
+            <div class="icon-img">💬</div>
+            <span>Chat</span>
         </div>
         
         <div class="icon" onclick="launchApp('Notes')">
@@ -351,11 +551,6 @@
         <div class="icon" onclick="launchApp('Games')">
             <div class="icon-img">🎮</div>
             <span>Games</span>
-        </div>
-
-        <div class="icon" onclick="launchApp('Terminal')">
-            <div class="icon-img">💻</div>
-            <span>Terminal</span>
         </div>
 
     </div>
@@ -404,7 +599,7 @@ function printBootLine() {
     bootText.appendChild(span);
     bootText.parentElement.scrollTop = bootText.parentElement.scrollHeight;
     bootLinesPrinted++;
-    setTimeout(printBootLine, 6.7);   // adjust speed here
+    setTimeout(printBootLine, 6.7);
   } else {
     const success = document.createElement("span");
     success.textContent = "[SUCCESS] Boot completed\n";
@@ -424,13 +619,91 @@ function startCountdown(seconds) {
     bootText.parentElement.scrollTop = bootText.parentElement.scrollHeight;
     setTimeout(() => startCountdown(seconds - 1), 1000);
   } else {
-    document.getElementById("boot").classList.add("hidden");
-    document.getElementById("loginScreen").classList.remove("hidden");
-    document.getElementById("user").focus();
+    startLogoAnimation();
   }
 }
 
-printBootLine();
+// After boot lines + countdown finishes
+function startLogoAnimation() {
+  // 1️⃣ Hide the boot screen
+  document.getElementById("boot").classList.add("hidden");
+
+  // 2️⃣ Show the logo screen
+  const logoScreen = document.getElementById("logoScreen");
+  logoScreen.classList.remove("hidden");
+
+  // Grab elements
+  const chromeLeft = document.getElementById("chromeLeft");
+  const chromeRight = document.getElementById("chromeRight");
+  const logo = document.getElementById("logo");
+  const logoS = document.getElementById("logoS");
+  const logoRest = document.getElementById("logoRest");
+
+  // Make sure they are visible
+  chromeLeft.style.display = "block";
+  chromeRight.style.display = "block";
+  logo.style.display = "flex";
+
+  // 3️⃣ Slide Chrome halves apart
+  chromeLeft.style.transition = "transform 1.5s ease, opacity 1.5s ease";
+  chromeRight.style.transition = "transform 1.5s ease, opacity 1.5s ease";
+  setTimeout(() => {
+    chromeLeft.style.transform = "translateX(-260px)";
+    chromeLeft.style.opacity = "0";
+    chromeRight.style.transform = "translateX(260px)";
+    chromeRight.style.opacity = "0";
+  }, 50);
+
+    // 4️⃣ Show S after halves slide
+  setTimeout(() => {
+    // Ensure S starts from invisible and small
+    logoS.style.opacity = "0";
+    logoS.style.transform = "scale(0.25)";
+    logoS.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+
+    // Force reflow so browser registers layout
+    void logoS.offsetWidth;
+
+    // Animate S
+    logoS.style.opacity = "1";
+    logoS.style.transform = "scale(1.1)";
+
+    // Then show rest of "noopyOS"
+    logoRest.style.opacity = "0";
+    logoRest.style.transform = "translateX(50px)";
+    logoRest.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+
+    // Force reflow again before animating rest
+    void logoRest.offsetWidth;
+
+    setTimeout(() => {
+      logoRest.style.opacity = "1";             // <-- now visible
+      logoRest.style.transform = "translateX(0)"; // <-- slides into place
+    }, 600);
+
+  }, 1600);
+
+  // 5️⃣ Move logo to align with login text, then show login
+  setTimeout(() => {
+    const login = document.getElementById("loginScreen");
+    const loginTitle = document.getElementById("loginTitle");
+    const rect = loginTitle.getBoundingClientRect();
+
+    logo.style.position = "absolute";
+    logo.style.top = rect.top + "px";
+    logo.style.left = rect.left + "px";
+    logo.style.transform = "scale(0.45)";
+    logo.style.transition = "all 0.8s ease";
+
+    setTimeout(() => {
+      logoScreen.remove();
+      login.classList.remove("hidden");
+      document.getElementById("user").focus();
+    }, 800);
+  }, 3000);
+}
+
+
 
 // ===== LOGIN =====
 function login() {
@@ -439,6 +712,33 @@ function login() {
   document.getElementById("loginScreen").remove();
   document.getElementById("osRoot").classList.remove("hidden");
 }
+
+// Start boot sequence
+printBootLine();
+
+// ===== LOGIN TITLE MOUSE FOLLOW =====
+const title = document.getElementById("loginTitle");
+let targetX = 0, targetY = 0;
+document.addEventListener("mousemove", e => {
+  targetX = (e.clientX - innerWidth / 2) / 50;
+  targetY = (e.clientY - innerHeight / 2) / 50;
+});
+
+function updateTitle() {
+  const currentTransform = title.style.transform || "translate(0px, 0px)";
+  const match = currentTransform.match(/translate\((-?\d+\.?\d*)px, (-?\d+\.?\d*)px\)/);
+  let curX = match ? parseFloat(match[1]) : 0;
+  let curY = match ? parseFloat(match[2]) : 0;
+
+  // Smooth follow
+  curX += (targetX - curX) * 0.1;
+  curY += (targetY - curY) * 0.1;
+
+  title.style.transform = `translate(${curX}px, ${curY}px)`;
+  requestAnimationFrame(updateTitle);
+}
+updateTitle();
+
 
 // ===== WINDOWS / TASKBAR =====
 const tasks = document.getElementById("tasks");
@@ -536,6 +836,7 @@ const appHTML = {
   "Soundboard": "https://thatoneguy-67.github.io/ThatOneGuys-Soundboard/",
   "Games": "https://thatoneguy-67.github.io/Games/",
   "Browser": "https://www.google.com",
+  "Notes": "https://thatoneguy-67.github.io/Notes/",
 };
 
 function getAppContent(app) {
@@ -552,6 +853,205 @@ function updateClock() {
 }
 setInterval(updateClock, 1000);
 updateClock();
+// ===== SCROLLBAR STYLING =====
+// (See style.css for related styles)
+// (No JS needed; handled via CSS)
+
+
+function launchSettings(){
+  const win = document.createElement("div");
+  win.className = "window glass";
+  win.style.zIndex = ++zIndex;
+  win.style.width="480px";
+  win.style.height="auto";
+  win.style.minHeight="360px";
+
+  const taskId = "task_" + Date.now();
+  win.dataset.task = taskId;
+
+  const taskBtn = document.createElement("button");
+  taskBtn.id = taskId;
+  taskBtn.textContent = "Settings";
+  taskBtn.className = "settingsbutton";
+  taskBtn.onclick = () => {
+    win.classList.toggle("hidden");
+    win.style.zIndex = ++zIndex;
+  };
+  document.getElementById("tasks").appendChild(taskBtn);
+
+  const titlebar = document.createElement("div");
+  titlebar.className = "titlebar";
+  titlebar.innerHTML = `
+    <span>Settings</span>
+    <div class="controls">
+      <button onclick="minimize(this)">—</button>
+      <button onclick="maximize(this)">▢</button>
+      <button onclick="closeWin(this,event)">✕</button>
+    </div>
+  `;
+  win.appendChild(titlebar);
+
+  const content = document.createElement("div");
+  content.className = "content scrollable";
+  content.style.cursor="none";
+  content.style.padding="20px";
+
+  content.innerHTML=`
+    <h2 style="margin-top:0;margin-bottom:20px;text-align:center;">Settings</h2>
+
+    <div class="setting">
+      <span>Notifications</span>
+      <label class="switch"><input type="checkbox" id="notifToggle"><span class="slider"></span></label>
+    </div>
+    <div class="setting">
+      <span>Sound Effects</span>
+      <label class="switch"><input type="checkbox" id="soundToggle"><span class="slider"></span></label>
+    </div>
+    <div class="setting">
+      <span>Cloak Mode</span>
+      <label class="switch"><input type="checkbox" id="cloakToggle"><span class="slider"></span></label>
+    </div>
+    <div class="setting">
+      <span>Dark Mode</span>
+      <label class="switch"><input type="checkbox" id="darkModeToggle"><span class="slider"></span></label>
+    </div>
+    <div class="setting">
+      <span>Accent Color</span>
+      <input type="color" id="accentPicker" style="width:60px;height:36px;border:none;border-radius:8px;">
+    </div>
+
+    <button id="saveSettingsBtn" class="settingsbutton" style="margin-top:20px;">Save Settings</button>
+    <button id="restoreDefaultsBtn" class="settingsbutton" style="margin-top:10px;background:rgba(120,40,40,0.5);">Restore Defaults</button>
+  `;
+  win.appendChild(content);
+  document.body.appendChild(win);
+
+  makeDraggable(win);
+  requestAnimationFrame(()=> {
+    const rect=win.getBoundingClientRect();
+    win.style.left = Math.max(0,(window.innerWidth-rect.width)/2)+"px";
+    win.style.top = Math.max(0,(window.innerHeight-rect.height)/2)+"px";
+  });
+
+  // ===== ELEMENTS =====
+  const accentPicker = content.querySelector("#accentPicker");
+  const notifToggle = content.querySelector("#notifToggle");
+  const soundToggle = content.querySelector("#soundToggle");
+  const cloakToggle = content.querySelector("#cloakToggle");
+  const darkModeToggle = content.querySelector("#darkModeToggle");
+  const saveBtn = content.querySelector("#saveSettingsBtn");
+  const restoreBtn = content.querySelector("#restoreDefaultsBtn");
+
+  // Load saved
+  accentPicker.value = localStorage.getItem("accent")||"#4da3ff";
+  document.documentElement.style.setProperty("--accent", accentPicker.value);
+  notifToggle.checked = JSON.parse(localStorage.getItem("notifications")??true);
+  soundToggle.checked = JSON.parse(localStorage.getItem("sounds")??true);
+  cloakToggle.checked = JSON.parse(localStorage.getItem("cloak")??false);
+  darkModeToggle.checked = JSON.parse(localStorage.getItem("darkMode")??false);
+
+  // Live accent update
+  accentPicker.addEventListener("input",()=>document.documentElement.style.setProperty("--accent",accentPicker.value));
+
+  // ===== SAVE SETTINGS =====
+  saveBtn.addEventListener("click",()=>{
+    localStorage.setItem("accent",accentPicker.value);
+    localStorage.setItem("notifications",notifToggle.checked);
+    localStorage.setItem("sounds",soundToggle.checked);
+    localStorage.setItem("cloak",cloakToggle.checked);
+    localStorage.setItem("darkMode",darkModeToggle.checked);
+
+    // Dark mode live
+    document.body.style.backgroundColor=darkModeToggle.checked?"#181818":"#ffffff";
+    document.body.style.color=darkModeToggle.checked?"#eee":"#000";
+
+    notify("Settings saved!");
+
+    // Cloak
+    if(cloakToggle.checked){
+      const winCloak = window.open("about:blank","_blank");
+      winCloak.document.write('<iframe src="'+location.href+'" style="border:none;width:100vw;height:100vh;"></iframe>');
+      window.close();
+    }
+  });
+
+  // ===== RESTORE DEFAULTS =====
+  restoreBtn.addEventListener("click",()=>{
+    const defaultAccent="#4da3ff";
+    accentPicker.value=defaultAccent;
+    notifToggle.checked=true;
+    soundToggle.checked=true;
+    cloakToggle.checked=false;
+    darkModeToggle.checked=false;
+
+    document.documentElement.style.setProperty("--accent",defaultAccent);
+    document.body.style.backgroundColor="#181818";
+    document.body.style.color="#eee";
+
+    localStorage.setItem("accent",defaultAccent);
+    localStorage.setItem("notifications",true);
+    localStorage.setItem("sounds",true);
+    localStorage.setItem("cloak",false);
+    localStorage.setItem("darkMode",false);
+
+    notify("Settings restored to defaults!");
+  });
+}
+
+
+// ===== NOTIFICATIONS =====
+function notify(text, duration = 4000) {
+  // Only show notifications if enabled in settings
+  const enabled = JSON.parse(localStorage.getItem("notifications") ?? true);
+  if (!enabled) return;
+
+  // Create toast
+  const toast = document.createElement("div");
+  toast.className = "toast glass"; // glass styling
+
+  // Content + timer bar
+  toast.innerHTML = `
+    <div class="toast-content">${text}</div>
+    <div class="toast-bar"></div>
+  `;
+
+  // Click to dismiss
+  toast.onclick = () => toast.remove();
+
+  // Append to toast container (create if doesn't exist)
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toast-container";
+    container.style.position = "fixed";
+    container.style.bottom = "20px";
+    container.style.left = "20px";
+    container.style.display = "flex";
+    container.style.flexDirection = "column";
+    container.style.gap = "12px";
+    container.style.zIndex = "9999";
+    document.body.appendChild(container);
+  }
+  container.appendChild(toast);
+
+  // Play sound if enabled
+  const soundEnabled = JSON.parse(localStorage.getItem("sounds") ?? true);
+  if (soundEnabled) {
+    const sound = new Audio("data:audio/wav;base64,UklGRhIAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQcAAAAA");
+    sound.play();
+  }
+
+  // Animate timer bar
+  const bar = toast.querySelector(".toast-bar");
+  bar.style.height = "4px";
+  bar.style.background = getComputedStyle(document.documentElement).getPropertyValue("--accent") || "#4da3ff";
+  bar.style.width = "100%";
+  bar.style.transition = `width ${duration}ms linear`;
+  requestAnimationFrame(() => bar.style.width = "0%");
+
+  // Auto-remove after duration
+  setTimeout(() => toast.remove(), duration);
+}
   </script>
 </body>
 </html>
